@@ -6,7 +6,10 @@ variable "users" {
   type = "list"
 }
 
-
-variable "user_groups" {
+variable "group_users" {
   type = "map"
+}
+
+variable "group_policies" {
+  type = "list"
 }
