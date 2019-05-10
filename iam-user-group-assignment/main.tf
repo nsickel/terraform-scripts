@@ -4,33 +4,45 @@ provider "aws" {
   region = "eu-central-1"
 }
 
-# create groups
-resource "aws_iam_group" "group" {
-  count = "${length(var.groups)}"
-  name  = "${element(var.groups,count.index)}"
+module "group_admin" {
+  source = "../modules/iam/group-with-members-and-policies"
+
+  group_name = "admin"
+  arn_policy_attachments = [
+    "arn:aws:iam::aws:policy/AdministratorAccess"
+  ]
+  specific_policy_attachments = []
+
+  group_users = ["john.doe@example.com"]
 }
 
-# attach policies to groups
-resource "aws_iam_group_policy_attachment" "group_policy" {
-  count       = "${length(var.group_policies)}"
-  group       = "${element(aws_iam_group.group.*.name,index(var.groups,element(keys(var.group_policies[count.index]),0)))}"
-  policy_arn  = "${element(values(var.group_policies[count.index]),0)}"
-}
+module "group_developer" {
+  source = "../modules/iam/group-with-members-and-policies"
 
-# create users
-resource "aws_iam_user" "user" {
-  count = "${length(var.users)}"
-  name  = "${element(var.users,count.index)}"
+  group_name = "developer"
+  arn_policy_attachments = [
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+    "arn:aws:iam::aws:policy/AWSLambdaFullAccess"
+  ]
+  specific_policy_attachments = [
+    {
+      policy_json = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:Describe*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
 }
+EOF
+      policy_name = "developer-ec2-describe"
+    }
+  ]
 
-# add users to groups
-resource "aws_iam_group_membership" "group_membership" {
-  count = "${length(var.groups)}"
-  name  = "${element(var.groups,count.index)}-membership"
-  users = "${var.group_users[element(var.groups,count.index)]}"
-  group = "${element(aws_iam_group.group.*.name,count.index)}"
-}
-
-output "groups" {
-  value = "${aws_iam_group.group.*.name}"
+  group_users = ["foo.bar@something.de", "test@test.de"]
 }
