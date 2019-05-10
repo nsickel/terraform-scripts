@@ -9,4 +9,4 @@ This module is able to manage an AWS IAM role and assign policies either via arn
 - specific_policy_attachments: array containing maps with self defined policies
 - arn_policy_attachments: array containing pre defined policy arns
 
-[example.tfvars](example.tfvars)
+[example](../../../examples/iam/group-with-members-and-policies)
