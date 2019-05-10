@@ -5,7 +5,7 @@ provider "aws" {
 }
 
 module "group_admin" {
-  source = "../modules/iam/group-with-members-and-policies"
+  source = "../../../modules/iam/group-with-members-and-policies"
 
   group_name = "admin"
   arn_policy_attachments = [
@@ -17,7 +17,7 @@ module "group_admin" {
 }
 
 module "group_developer" {
-  source = "../modules/iam/group-with-members-and-policies"
+  source = "../../../modules/iam/group-with-members-and-policies"
 
   group_name = "developer"
   arn_policy_attachments = [
